@@ -7,11 +7,4 @@ const dbConnection = mysql.createConnection({
   database: "real_estates"
 });
 
-dbConnection.connect(function(err) {
-  if (err != null) {
-    console.error("error connecting: " + err.stack);
-    return;
-  }
-  console.log("connected as id " + dbConnection.threadId);
-});
 module.exports = dbConnection;
