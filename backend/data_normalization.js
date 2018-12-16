@@ -10,6 +10,12 @@ const options = {
 function numberConverter(value) {
   return Number(value);
 }
+function imgValidator(imgArr) {
+  const newImg = imgArr.filter(
+    img => img !== "/Content/resources/img/logo-color.png"
+  );
+  return newImg;
+}
 
 const requiredFields = ["url", "price", "title", "market_date"];
 
@@ -48,6 +54,7 @@ module.exports.normalizeRowData = ({ raw: data }) => {
 
   return {
     ...data,
+    market_date: data.market_date.replace(/[^\d]/g, "-"),
     title: data.title.trim(),
     description: data.description.trim(),
     location: {
@@ -68,7 +75,8 @@ module.exports.normalizeRowData = ({ raw: data }) => {
     price: {
       value: numberConverter(String(data.price.value.replace(/[^\d]/g, ""))),
       currency: data.price.currency
-    }
+    },
+    images: imgValidator(data.images)
   };
 };
 // (async () => {

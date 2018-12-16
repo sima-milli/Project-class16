@@ -1,12 +1,18 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const dbConnection = require("../DB/config");
+const cors = require("cors");
 const { validateData, normalizeRowData } = require("./data_normalization");
 
 const app = express();
+
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
+app.use(cors());
 
+app.get("/", (req, res) => {
+  res.send("Hello, please search a city to display");
+});
 app.get("/searchData", (req, res) => {
   const city = req.query.city || null;
   let queryWhere = "";
@@ -16,6 +22,20 @@ app.get("/searchData", (req, res) => {
   }
   dbConnection.query(
     `select * from property ${queryWhere};`,
+    (err, result, fields) => {
+      if (err) {
+        res.status(400).end();
+      }
+      res.json({ result });
+    }
+  );
+});
+
+app.get("/cityChart", (req, res) => {
+  const city = req.query.city;
+  dbConnection.query(
+    `SELECT location_city,DATEDIFF(CURDATE(), market_date) AS days, AVG(price_value), market_date FROM property 
+  WHERE location_city = '${city}' GROUP BY market_date;`,
     (err, result, fields) => {
       if (err) {
         res.status(400).end();
@@ -39,7 +59,6 @@ app.post("/uploadData", (req, res) => {
       .end();
 
     const normalizedData = validData.map(normalizeRowData);
-    console.log("normalizedData: ", normalizedData);
     if (normalizedData.length) {
       let values = [];
       normalizedData.map((data, i) => {
