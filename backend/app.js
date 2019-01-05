@@ -130,16 +130,12 @@ app.post("/uploadData/json", (req, res) => {
   res.end();
 });
 app.post("/uploadData/url", (req, res) => {
-  try {
-    const { link } = req.body;
-    urlData(link).then(data => {
-      console.log(data);
-    });
-  } catch (err) {
-    console.log(err);
-    res.status(400).end();
-  }
+  const link = req.body.url;
+  urlData(link).then(data => {
+    console.log("data from app", data.length);
+  });
 });
+
 app.use("*", (req, res) => {
   res.json({ message: "404 page not found!" });
 });

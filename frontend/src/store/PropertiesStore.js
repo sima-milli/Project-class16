@@ -105,11 +105,11 @@ class PropertiesStore {
   postFromUrl(jsonFromUrl) {
     return fetch("http://localhost:3121/uploadData/url", {
       method: "POST",
-      body: jsonFromUrl,
+      body: JSON.stringify(jsonFromUrl),
       headers: {
         "Access-Control-Allow-Origin": "*",
         "Access-Control-Allow-Methods": "GET,PUT,POST,DELETE",
-        "Content-type": "application/x-www-form-urlencoded"
+        "Content-type": "application/json"
       }
     }).then(response => response.json());
   }

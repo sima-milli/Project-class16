@@ -89,7 +89,11 @@ module.exports.normalizeRowData = ({ raw: data }) => {
   };
 };
 module.exports.urlData = url => {
-  return fetch(url)
-    .then(response => response.json())
-    .catch(err => console.log(err));
+  return rp(url)
+    .then(repos => {
+      return repos;
+    })
+    .catch(err => {
+      console.log(err);
+    });
 };

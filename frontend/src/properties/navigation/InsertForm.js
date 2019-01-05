@@ -8,7 +8,7 @@ class InsertForm extends React.Component {
   insertJson = e => {
     e.preventDefault();
     const jsonFromText = this.inputFromText.value;
-    const jsonFromUrl = this.inputFromUrl.value;
+    const jsonFromUrl = { url: this.inputFromUrl.value };
     this.props.PropertiesStore.createProperty(jsonFromText, jsonFromUrl);
   };
   render() {
