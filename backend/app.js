@@ -2,7 +2,11 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const dbConnection = require("../DB/config");
 const cors = require("cors");
-const { validateData, normalizeRowData } = require("./data_normalization");
+const {
+  validateData,
+  normalizeRowData,
+  urlData
+} = require("./data_normalization");
 
 const app = express();
 
@@ -21,7 +25,7 @@ app.get("/searchData", (req, res) => {
     queryWhere = `WHERE location_city = "${city}"`;
   }
   dbConnection.query(
-    `select * from property ${queryWhere};`,
+    `SELECT * FROM property ${queryWhere};`,
     (err, result, fields) => {
       if (err) {
         res.status(400).end();
@@ -30,12 +34,22 @@ app.get("/searchData", (req, res) => {
     }
   );
 });
-
+app.get("/allCities", (req, res) => {
+  dbConnection.query(
+    `SELECT location_city, COUNT(*) count FROM property GROUP BY location_city;`,
+    (err, result, fields) => {
+      if (err) {
+        res.status(400).end();
+      }
+      res.json({ result });
+    }
+  );
+});
 app.get("/cityChart", (req, res) => {
   const city = req.query.city;
   dbConnection.query(
-    `SELECT location_city,DATEDIFF(CURDATE(), market_date) AS days, AVG(price_value), market_date FROM property 
-  WHERE location_city = '${city}' GROUP BY market_date;`,
+    `SELECT DATEDIFF(CURDATE(), market_date) AS days, SUM(price_value) AS sum, COUNT(*) AS count FROM property 
+  WHERE location_city = '${city}' AND DATEDIFF(CURDATE(), market_date) <= 10 GROUP BY market_date ORDER BY days;`,
     (err, result, fields) => {
       if (err) {
         res.status(400).end();
@@ -45,9 +59,10 @@ app.get("/cityChart", (req, res) => {
   );
 });
 
-app.post("/uploadData", (req, res) => {
+app.post("/uploadData/json", (req, res) => {
   try {
     const data = validateData(req.body);
+
     const validData = data.filter(item => item.error === null);
     res
       .json({
@@ -114,7 +129,17 @@ app.post("/uploadData", (req, res) => {
 
   res.end();
 });
-
+app.post("/uploadData/url", (req, res) => {
+  try {
+    const { link } = req.body;
+    urlData(link).then(data => {
+      console.log(data);
+    });
+  } catch (err) {
+    console.log(err);
+    res.status(400).end();
+  }
+});
 app.use("*", (req, res) => {
   res.json({ message: "404 page not found!" });
 });

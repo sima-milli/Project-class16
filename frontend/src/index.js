@@ -6,6 +6,7 @@ import * as serviceWorker from "./serviceWorker";
 import { Provider } from "mobx-react";
 import PropertiesStore from "./store/PropertiesStore";
 import "bootstrap/dist/css/bootstrap.css";
+
 const Root = (
   <Provider PropertiesStore={PropertiesStore}>
     <App />

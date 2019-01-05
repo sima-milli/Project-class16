@@ -6,6 +6,15 @@ const options = {
     "https://api.apify.com/v1/execs/4BeiTQ5gLzWjXcYmN/results?format=json&simplified=1",
   json: true
 };
+const day2 =
+  "https://api.apify.com/v1/execs/KY9Ez8eWkeCYRDCNy/results?format=json&simplified=1";
+
+const day3 =
+  "https://api.apify.com/v1/execs/Fwyjq9rgXvm2DoCrN/results?format=json&simplified=1";
+const day4 =
+  "https://api.apify.com/v1/execs/QpMcHZA7wHsSnae94/results?format=json&simplified=1";
+const day5 =
+  "https://api.apify.com/v1/execs/pKwxrLew2FWMYT5bt/results?format=json&simplified=1";
 
 function numberConverter(value) {
   return Number(value);
@@ -17,7 +26,7 @@ function imgValidator(imgArr) {
   return newImg;
 }
 
-const requiredFields = ["url", "price", "title", "market_date"];
+const requiredFields = ["url", "price", "title"];
 
 const keepValid = (process, item) => {
   let error = null;
@@ -50,11 +59,11 @@ module.exports.validateData = data => {
 };
 
 module.exports.normalizeRowData = ({ raw: data }) => {
-  console.log("data: ", data);
-
   return {
     ...data,
-    market_date: data.market_date.replace(/[^\d]/g, "-"),
+    market_date: data.market_date
+      ? data.market_date.replace(/[^\d]/g, "-")
+      : new Date(),
     title: data.title.trim(),
     description: data.description.trim(),
     location: {
@@ -79,16 +88,8 @@ module.exports.normalizeRowData = ({ raw: data }) => {
     images: imgValidator(data.images)
   };
 };
-// (async () => {
-//   try {
-//     const data = await rp(options);
-//     // console.log("data: ", data[0]);
-//     console.log("data length : ", data.length);
-//     let normalizedData = normalize(data);
-//     // console.log("normalizedData: ", normalizedData[0]);
-//     // await writeToJson(normalizedData);
-//     console.log("normalize length: ", normalizedData.length);
-//   } catch (err) {
-//     console.log(err);
-//   }
-// })();
+module.exports.urlData = url => {
+  return fetch(url)
+    .then(response => response.json())
+    .catch(err => console.log(err));
+};
